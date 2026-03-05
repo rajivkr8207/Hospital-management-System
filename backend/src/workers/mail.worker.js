@@ -1,54 +1,44 @@
 import { Worker } from "bullmq";
-import nodemailer from "nodemailer";
-import { sendResetPasswordEmail, verifyEmailsendemail } from "../service/email.service.js";
 import redis from "../config/redis.js";
-
-
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.MAIL_EMAIL,
-        pass: process.env.MAIL_PASSWORD
-    }
-});
+import mailHandlers from "../handlers/mail.handlers.js";
+import { failMailQueue } from "../queues/mail.queue.js";
 
 const mailWorker = new Worker(
-    "mailQueue",
-    async (job) => {
+  "mailQueue",
+  async (job) => {
 
-        const { email, name, hashtoken } = job.data;
+    const handler = mailHandlers[job.name];
 
-        switch (job.name) {
+    if (!handler) {
+      throw new Error(`No handler found for job: ${job.name}`);
+    }
 
-            case "welcomeMail":
-                await transporter.sendMail({
-                    from: process.env.MAIL_EMAIL,
-                    to: email,
-                    subject: "Welcome to Our Hospital System",
-                    html: `<h3>Welcome ${name || ""} to our platform</h3>`
-                });
-                break;
+    return handler(job.data);
 
-            case "forgotPasswordMail":
-                await sendResetPasswordEmail(email, name, hashtoken);
-                break;
-
-            case "verifyMail":
-                await verifyEmailsendemail(email, name, hashtoken);
-                break;
-
-            default:
-                console.log("Unknown mail job:", job.name);
-        }
-
-    },
-    { connection: redis }
+  },
+  {
+    connection: redis,
+    concurrency: 10
+  }
 );
 
 mailWorker.on("completed", (job) => {
-    console.log(`Mail job ${job.name} completed`);
+  console.log(`Mail job ${job.name} completed`);
 });
 
-mailWorker.on("failed", (job, err) => {
-    console.error(`Mail job ${job?.name} failed: ${err.message}`);
+mailWorker.on("failed", async (job, err) => {
+
+  console.error(`Mail job ${job?.name} failed: ${err.message}`);
+
+  if (job.attemptsMade >= 2) {
+
+    await failMailQueue.add(job.name, job.data, {
+      attempts: 1,
+      removeOnComplete: true
+    });
+
+  }
+
 });
+
+export default mailWorker;

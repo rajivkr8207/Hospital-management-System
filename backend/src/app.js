@@ -8,6 +8,7 @@ import AuthRouter from './routes/auth.routes.js'
 import Doctorrouter from './routes/doctor.route.js'
 import Departmentrouter from './routes/department.routes.js'
 import Adminrouter from './routes/admin.route.js'
+import { mailQueue } from './queues/mail.queue.js'
 // import multer 
 // const AuthRouter = require('./routes/auth.routes.js')
 // const cookieParser = require('cookie-parser')
@@ -22,18 +23,20 @@ app.use(morgan('dev'))
 app.use(cookieParser())
 
 app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    // allowedHeaders: ["Content-Type", "Authorization"]
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  // allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 // app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.get("/health", (req, res) => {
+app.get("/health",(req, res) => {
+  const jobid =  mailQueue.add("welcomeMail", {});
   res.status(200).json({
     success: true,
     status: "OK",
     timestamp: new Date(),
+    jobid
   });
 });
 

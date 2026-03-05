@@ -7,7 +7,7 @@ const redis = new Redis({
     password: config.REDIS_PASSWORD  ,
     maxRetriesPerRequest: null,
 })
-
+// 
 redis.on("connect", ()=>{
     console.log(`server is connected to redis`);
 })

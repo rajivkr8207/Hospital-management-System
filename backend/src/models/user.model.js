@@ -38,7 +38,7 @@ const UserScheme = new mongoose.Schema({
 
     photo: {
         type: String,
-        
+        default: "https://ik.imagekit.io/rjdev/defaultprofile.jpg?updatedAt=1770791908606"
     },
     isBlock: {
         type: Boolean,

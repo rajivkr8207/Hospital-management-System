@@ -15,8 +15,6 @@ const config = {
     MAIL_PASS: process.env.MAIL_PASS,
     MAIL_EMAIL: process.env.MAIL_EMAIL,
     IMAGE_KIT: process.env.IMAGE_KIT,
-
-
 };
 
 export default config;

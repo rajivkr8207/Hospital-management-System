@@ -1,13 +1,43 @@
+import config from '../config/config.js';
 import MailTranspoter from '../config/mail.js'
 
-export const verifyEmailsendemail = async ({ email,name, hashtoken }) => {
-     const url = `${process.env.FRONTEND_URL}/verify-email?token=${hashtoken}`;
-    try {
-        const mailoptions = {
-            from: process.env.MAIL_EMAIL,
-            to: email,
-            subject: "verify your email",
-            html: `
+
+
+export const tesingsendemail = async () => {
+  const url = `${config.FRONTEND_URL}/verify-email?token=rajiv`;
+  try {
+    const mailoptions = {
+      from: config.MAIL_EMAIL,
+      to: 'rajiv.kr8207@gmail.com',
+      subject: "verify your email",
+      html: `
+     <h2>Hello Rajiv,</h2>
+    <p>Your account has been created successfully.</p>
+    <p>Please click below to verify your email:</p>
+    <a href="${url}" 
+       style="background:#007bff; padding:10px 20px; color:white; text-decoration:none;">
+       Verify Email
+    </a>
+    <p>This link expires in 15 minutes.</p>
+    `,
+
+    }
+    const mailresponse = await MailTranspoter.sendMail(mailoptions)
+    return mailresponse
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+export const verifyEmailsendemail = async ( email, name, hashtoken ) => {
+  const url = `${config.FRONTEND_URL}/verify-email?token=${hashtoken}`;
+  try {
+    const mailoptions = {
+      from: config.MAIL_EMAIL,
+      to: email,
+      subject: "verify your email",
+      html: `
      <h2>Hello ${name},</h2>
     <p>Your account has been created successfully.</p>
     <p>Please click below to verify your email:</p>
@@ -18,21 +48,21 @@ export const verifyEmailsendemail = async ({ email,name, hashtoken }) => {
     <p>This link expires in 15 minutes.</p>
     `,
 
-        }
-        const mailresponse = await MailTranspoter.sendMail(mailoptions)
-        return mailresponse
-    } catch (error) {
-        console.error(error);
     }
+    const mailresponse = await MailTranspoter.sendMail(mailoptions)
+    return mailresponse
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 
-export const sendResetPasswordEmail = async ({ email, name, hashtoken }) => {
-  const url = `${process.env.FRONTEND_URL}/reset-password?token=${hashtoken}`;
+export const sendResetPasswordEmail = async (email, name, hashtoken ) => {
+  const url = `${config.FRONTEND_URL}/reset-password?token=${hashtoken}`;
 
   try {
     const mailoptions = {
-      from: process.env.MAIL_EMAIL,
+      from: config.MAIL_EMAIL,
       to: email,
       subject: "Reset Your Password",
       html: `

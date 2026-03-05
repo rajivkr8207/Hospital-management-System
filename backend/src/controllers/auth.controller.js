@@ -5,7 +5,7 @@ import imageService from "../service/image.service.js";
 import GenratePasswordHash from "../utils/GenratePasswordHash.js";
 import GenrateTokenByEmail from "../utils/GenrateTokenByEmail.js";
 import { mailQueue } from "../queues/mail.queue.js";
-import { verifyEmailsendemail } from "../service/email.service.js";
+import { imageQueue } from "../queues/image.queue.js";
 
 
 
@@ -18,23 +18,27 @@ export const RegisterUser = async (req, res) => {
             message: 'user is already exist of username email'
         })
     }
-    const imgurl = await imageService.CreateAvatar(file)
-    const photo = imgurl.url
-    const user = await AuthService.CreateUser(email, username, password, dob, gender, fullname, photo)
+
+    const user = await AuthService.CreateUser(email, username, password, dob, gender, fullname)
     const user_id = user._id
     const emergency_contact_number = emergency_number
     const patient = await patientService.CreatePatient(user_id, phone_no, address, city, state, pincode, blood_group, description, emergency_contact_number)
-
-    // await mailQueue.add("verifyMail", {
+    const token = await GenrateTokenByEmail(email)
+    // mailQueue.add("verifyMail", {
     //     email: email,
     //     name: fullname,
-    //     hashtoken: await GenrateTokenByEmail(email)
-    // }, {
-    //     attempts: 2,
-    //     backoff: { type: "exponential", delay: 3000 }
+    //     hashtoken: token
     // });
-    const token = await GenrateTokenByEmail(email)
-    await verifyEmailsendemail(email,fullname, token)
+    if (file) {
+
+        const tempUrl = await imageService.saveTemp(file)
+
+        imageQueue.add("uploadAvatar", {
+            userId: user._id,
+            tempUrl
+        })
+
+    }
     return res.status(201).json({
         message: "User is created successfully",
         user,
@@ -74,10 +78,19 @@ export const ReSendVerifyEmail = async (req, res) => {
             message: 'user is not exist of username and email'
         })
     }
+    if (user.isActive) {
+        return res.status(400).json({
+            message: 'your account is already verified'
+        })
+    }
     const token = await GenrateTokenByEmail(email)
 
     await AuthService.ReGenrateTokenSave(user._id, token)
-    // await sendMail(email, "VERIFY", token)
+    mailQueue.add("verifyMail", {
+        email: email,
+        name: user.fullname,
+        hashtoken: token
+    });
     return res.status(200).json({
         message: "check your email",
     });

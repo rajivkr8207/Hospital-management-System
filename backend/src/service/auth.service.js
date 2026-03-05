@@ -2,9 +2,8 @@ import Usermodel from '../models/user.model.js'
 
 class AuthService {
 
-    async CreateUser(email, username, password, dob, gender, fullname, photo, role = 'PATIENT') {
-        console.log(photo);
-        const user = await Usermodel.create({ email, username, password, dob, gender, fullname, photo, role })
+    async CreateUser(email, username, password, dob, gender, fullname, role = 'PATIENT') {
+        const user = await Usermodel.create({ email, username, password, dob, gender, fullname, role })
         return user;
     }
 
