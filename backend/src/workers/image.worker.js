@@ -1,22 +1,27 @@
 import { Worker } from "bullmq"
 import redis from "../config/redis.js"
-import User from "../models/user.model.js"
-import imageService from "../service/image.service.js"
-
+import ImageHandlers from "../handlers/image.handlers.js"
+import ConnectDB from "../config/database.js";
+await ConnectDB();
 const imageWorker = new Worker(
   "imageQueue",
   async (job) => {
+    const imghandler = ImageHandlers[job.name];
 
-    const { userId, tempUrl } = job.data
-
-    const img = await imageService.CreateAvatar(tempUrl)
-
-    await User.findByIdAndUpdate(userId, {
-      photo: img.url
-    })
-
+    if (!imghandler) {
+      throw new Error(`No imghandler found for job: ${job.name}`);
+    }
+    return imghandler(job.data);
   },
   { connection: redis }
 )
+
+imageWorker.on("completed", (job) => {
+  console.log(`Job completed ${job.id}`);
+});
+
+imageWorker.on("failed", (job, err) => {
+  console.log(`Job failed ${job.id}`, err);
+});
 
 export default imageWorker

@@ -1,8 +1,5 @@
 import DepartmentModel from "../models/department.model.js";
 
-/* =========================
-   CREATE Department
-   ========================= */
 export const createDepartment = async (req, res) => {
   try {
     const { name, department_code, description } = req.body;
@@ -39,9 +36,6 @@ export const createDepartment = async (req, res) => {
 };
 
 
-/* =========================
-   GET All Departments
-   ========================= */
 export const getAllDepartments = async (req, res) => {
   try {
     const departments = await DepartmentModel.find().sort({ createdAt: -1 });
@@ -61,9 +55,6 @@ export const getAllDepartments = async (req, res) => {
 };
 
 
-/* =========================
-   GET Single Department
-   ========================= */
 export const getDepartmentById = async (req, res) => {
   try {
     const department = await DepartmentModel.findById(req.params.id);
@@ -89,9 +80,6 @@ export const getDepartmentById = async (req, res) => {
 };
 
 
-/* =========================
-   UPDATE Department
-   ========================= */
 export const updateDepartment = async (req, res) => {
   try {
     const { name, department_code, description, is_active } = req.body;
@@ -127,9 +115,6 @@ export const updateDepartment = async (req, res) => {
 };
 
 
-/* =========================
-   DELETE Department
-   ========================= */
 export const deleteDepartment = async (req, res) => {
   try {
     const department = await DepartmentModel.findById(req.params.id);

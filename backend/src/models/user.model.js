@@ -65,12 +65,10 @@ const UserScheme = new mongoose.Schema({
 
 
 UserScheme.pre('save', async function (next) {
-    const token = await bcrypt.hash(this.email.toString(), 10)
-
+    
     if (!this.isModified("password")) return next()
     this.password = await bcrypt.hash(this.password, 10)
-    this.verificationToken = token;
-    this.verificationTokenExpire = Date.now() + 3600000;
+  
 })
 
 UserScheme.methods.ComparePassword = async function (enteredPassword) {

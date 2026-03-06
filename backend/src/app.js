@@ -9,6 +9,7 @@ import Doctorrouter from './routes/doctor.route.js'
 import Departmentrouter from './routes/department.routes.js'
 import Adminrouter from './routes/admin.route.js'
 import { mailQueue } from './queues/mail.queue.js'
+import TreatmentRouter from './routes/treatment.route.js'
 // import multer 
 // const AuthRouter = require('./routes/auth.routes.js')
 // const cookieParser = require('cookie-parser')
@@ -52,7 +53,7 @@ app.use('/api/auth', AuthRouter)
 app.use('/api/doctor', Doctorrouter)
 app.use('/api/department', Departmentrouter)
 app.use('/api/admin', Adminrouter)
-// app.use('/api/doctor', Doctorrouter)
+app.use('/api/treatment', TreatmentRouter)
 
 
 export default app

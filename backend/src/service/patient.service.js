@@ -6,6 +6,16 @@ class PatientService {
         const user = await Patientmodel.create({ user_id, phone_no, address, city, state, pincode, blood_group, description, emergency_contact_number })
         return user;
     }
+
+
+    async FindPatientUser(userid) {
+        const user = await Patientmodel.findOne({
+            user_id: userid
+        })
+        return user
+    }
+
+
 }
 
 export default new PatientService;

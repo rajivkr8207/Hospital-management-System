@@ -2,8 +2,8 @@ import Usermodel from '../models/user.model.js'
 
 class AuthService {
 
-    async CreateUser(email, username, password, dob, gender, fullname, role = 'PATIENT') {
-        const user = await Usermodel.create({ email, username, password, dob, gender, fullname, role })
+    async CreateUser(email, username, password, dob, gender, fullname, verificationToken, verificationTokenExpire, role = 'PATIENT') {
+        const user = await Usermodel.create({ email, username, password, dob, gender, fullname, role, verificationToken, verificationTokenExpire })
         return user;
     }
 
@@ -77,6 +77,11 @@ class AuthService {
             email
         })
         return user
+    }
+    async UpdateImageAvatar(userId, imgurl) {
+        return await Usermodel.findByIdAndUpdate(userId, {
+            photo: imgurl
+        })
     }
 
     async FindById(id) {

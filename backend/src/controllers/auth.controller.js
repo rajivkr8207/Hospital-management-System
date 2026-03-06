@@ -6,6 +6,7 @@ import GenratePasswordHash from "../utils/GenratePasswordHash.js";
 import GenrateTokenByEmail from "../utils/GenrateTokenByEmail.js";
 import { mailQueue } from "../queues/mail.queue.js";
 import { imageQueue } from "../queues/image.queue.js";
+import DoctorService from "../service/doctor.service.js";
 
 
 
@@ -18,31 +19,28 @@ export const RegisterUser = async (req, res) => {
             message: 'user is already exist of username email'
         })
     }
-
-    const user = await AuthService.CreateUser(email, username, password, dob, gender, fullname)
+    const token = await GenrateTokenByEmail(email)
+    const verificationToken = token;
+    const verificationTokenExpire = Date.now() + 3600000;
+    const user = await AuthService.CreateUser(email, username, password, dob, gender, fullname, verificationToken, verificationTokenExpire)
     const user_id = user._id
     const emergency_contact_number = emergency_number
-    const patient = await patientService.CreatePatient(user_id, phone_no, address, city, state, pincode, blood_group, description, emergency_contact_number)
-    const token = await GenrateTokenByEmail(email)
-    // mailQueue.add("verifyMail", {
-    //     email: email,
-    //     name: fullname,
-    //     hashtoken: token
-    // });
+    await patientService.CreatePatient(user_id, phone_no, address, city, state, pincode, blood_group, description, emergency_contact_number)
+
+    mailQueue.add("verifyMail", {
+        email: email,
+        name: fullname,
+        hashtoken: token
+    });
     if (file) {
-
-        const tempUrl = await imageService.saveTemp(file)
-
         imageQueue.add("uploadAvatar", {
             userId: user._id,
-            tempUrl
+            file
         })
 
     }
     return res.status(201).json({
         message: "User is created successfully",
-        user,
-        patient
     })
 }
 export const LoginUser = async (req, res) => {
@@ -146,16 +144,27 @@ export const VerifyForgetPassword = async (req, res) => {
 
 export const ProfileUser = async (req, res) => {
     const userid = req.user.id
+    const role = req.user.role
     const user = await AuthService.FindById(userid)
     if (!user) {
         return res.status(400).json({
             message: 'user is not exist of this username and email'
         })
     }
+    let userdata = null
+    if (role == "DOCTOR") {
+        const usersdoc = await DoctorService.FindDoctorUser(userid)
+        userdata = usersdoc
+    }
+    if (role == 'PATIENT') {
+        const userpatient = await patientService.FindPatientUser(userid)
+        userdata = userpatient
+    }
 
     return res.status(200).json({
         message: "profile fetch successfully",
-        user
+        user,
+        userdata
     })
 }
 

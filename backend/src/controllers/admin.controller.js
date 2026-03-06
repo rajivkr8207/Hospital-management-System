@@ -1,6 +1,5 @@
 import crypto from "crypto";
 import DoctorInvite from "../models/doctorInvite.model.js";
-import { sendDoctorInviteEmail } from "../utils/sendDoctorInviteEmail.js";
 
 export const inviteDoctor = async (req, res) => {
     try {
@@ -17,16 +16,15 @@ export const inviteDoctor = async (req, res) => {
 
         const registerLink = `${process.env.FRONTEND_URL}/doctor-register?token=${token}`;
 
-        await sendDoctorInviteEmail({
-            email,
-            registerLink,
-        });
 
+        mailQueue.add("sendDoctorInvite", {
+            email: email,
+            registerLink: registerLink
+        });
         res.status(201).json({
             success: true,
             message: "Doctor invite sent successfully",
         });
-
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

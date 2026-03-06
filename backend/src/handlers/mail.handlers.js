@@ -3,6 +3,7 @@ import {
   verifyEmailsendemail,
   tesingsendemail
 } from "../service/email.service.js";
+import { sendDoctorInviteEmail } from "../utils/sendDoctorInviteEmail.js";
 
 const mailHandlers = {
 
@@ -16,8 +17,11 @@ const mailHandlers = {
 
   verifyMail: async ({ email, name, hashtoken }) => {
     return verifyEmailsendemail(email, name, hashtoken);
-  }
+  },
 
+  sendDoctorInvite: async ({email, registerLink})=>{
+    return sendDoctorInviteEmail({email, registerLink})
+  }
 };
 
 export default mailHandlers;

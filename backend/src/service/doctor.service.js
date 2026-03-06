@@ -15,7 +15,7 @@ class DoctorService {
         return user
     }
 
-    async CreateUserDoctor(userid, department_id, specialization, qualification, experience_years, license_number, consultation_fee, bio) {
+    async CreateUserDoctor(userid, department_id, specialization, qualification, experience_years, license_number, consultation_fee, phone_number, bio) {
         const userdoctor = await doctorModel.create({
             user_id: userid,
             department_id: department_id,
@@ -24,6 +24,7 @@ class DoctorService {
             experience_years,
             license_number,
             consultation_fee,
+            phone_number,
             bio
         })
         return userdoctor

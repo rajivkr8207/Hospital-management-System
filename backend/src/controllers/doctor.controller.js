@@ -2,11 +2,13 @@ import AuthService from "../service/auth.service.js";
 import imageService from "../service/image.service.js";
 import DoctorService from "../service/doctor.service.js";
 import DoctorAvailabilityService from "../service/DoctorAvailability.server.js";
+import { imageQueue } from "../queues/image.queue.js";
+import AppointmentModel from "../models/appointment.model.js";
 
 export const registerDoctorFromInvite = async (req, res) => {
     try {
+        const token = req.query.token
         const {
-            token,
             email,
             username,
             password,
@@ -18,6 +20,7 @@ export const registerDoctorFromInvite = async (req, res) => {
             experience_years,
             license_number,
             consultation_fee,
+            phone_number,
             bio
         } = req.body;
         const { file } = req.file
@@ -36,9 +39,10 @@ export const registerDoctorFromInvite = async (req, res) => {
                 message: 'user is already exist of username email'
             })
         }
-        const imgkiturl = await imageService.CreateAvatar(file)
-
-        const user = await AuthService.CreateUser(email, username, password, dob, gender, fullname, imgurl = imgkiturl.url)
+        const veritoken = await GenrateTokenByEmail(email)
+        const verificationToken = veritoken;
+        const verificationTokenExpire = Date.now() + 3600000;
+        const user = await AuthService.CreateUser(email, username, password, dob, gender, fullname, verificationToken, verificationTokenExpire, 'DOCTOR')
 
         await DoctorService.CreateUserDoctor(
             user._id,
@@ -48,16 +52,21 @@ export const registerDoctorFromInvite = async (req, res) => {
             experience_years,
             license_number,
             consultation_fee,
+            phone_number,
             bio
         );
         invite.is_used = true;
         await invite.save();
-
+        if (file) {
+            imageQueue.add("uploadAvatar", {
+                userId: user._id,
+                file
+            })
+        }
         res.status(201).json({
             success: true,
             message: "Doctor registered successfully"
         });
-
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -324,4 +333,71 @@ export const deleteAvailability = async (req, res) => {
             message: error.message
         });
     }
+};
+
+
+
+
+export const getDoctorAppointments = async (req, res) => {
+    try {
+
+        const doctorId = req.user.id; // token se
+
+        const appointments = await AppointmentModel.find({
+            doctorId
+        })
+            .populate("patientId", "name email phone")
+            .populate("departmentId", "name")
+            .sort({ appointmentDatetime: 1 });
+
+        res.status(200).json({
+            success: true,
+            data: appointments
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+export const updateAppointmentStatus = async (req, res) => {
+
+    try {
+
+        const doctorId = req.user.id;
+        const { appointmentId } = req.params;
+        const { status } = req.body;
+
+        const appointment = await AppointmentModel.findOne({
+            _id: appointmentId,
+            doctorId
+        });
+
+        if (!appointment) {
+            return res.status(404).json({
+                message: "Appointment not found"
+            });
+        }
+
+        appointment.status = status;
+
+        await appointment.save();
+
+        res.status(200).json({
+            success: true,
+            data: appointment
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
 };
