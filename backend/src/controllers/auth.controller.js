@@ -66,6 +66,11 @@ export const LoginUser = async (req, res) => {
     res.cookie('hospital', gentoken);
     return res.status(200).json({
         message: "Login successful",
+        user: {
+            username: user.username,
+            id: user._id,
+            role: user.role
+        }
     });
 }
 export const ReSendVerifyEmail = async (req, res) => {
@@ -260,6 +265,42 @@ export const changeUserPassword = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Server error",
+            error: error.message
+        });
+    }
+};
+
+export const get_me = (req, res) => {
+    try {
+        return res.status(200).json({
+            success: true,
+            user: req.user
+        });
+    } catch (error) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid or expired token",
+            error: error.message
+        });
+    }
+};
+
+export const LogoutUser = async (req, res) => {
+    try {
+        // The cookie name should match the one used in LoginUser, which is 'hospital'
+        res.clearCookie('hospital', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: 'strict'
+        });
+        return res.status(200).json({
+            success: true,
+            message: "Logout successful"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Server error during logout",
             error: error.message
         });
     }

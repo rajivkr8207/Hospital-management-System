@@ -1,5 +1,5 @@
 import express from "express";
-import { createTreatment, getTodayTreatments, updateTreatment } from "../controllers/treatment.controller";
+import { createTreatment, getTodayTreatments, updateTreatment } from "../controllers/treatment.controller.js";
 
 const TreatmentRouter = express.Router();
 

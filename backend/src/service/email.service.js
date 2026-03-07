@@ -30,8 +30,8 @@ export const tesingsendemail = async () => {
 }
 
 
-export const verifyEmailsendemail = async ( email, name, hashtoken ) => {
-  const url = `${config.FRONTEND_URL}/verify-email?token=${hashtoken}`;
+export const verifyEmailsendemail = async (email, name, hashtoken) => {
+  const url = `${config.FRONTEND_URL}/verify-token?token=${hashtoken}`;
   try {
     const mailoptions = {
       from: config.MAIL_EMAIL,
@@ -57,7 +57,7 @@ export const verifyEmailsendemail = async ( email, name, hashtoken ) => {
 }
 
 
-export const sendResetPasswordEmail = async (email, name, hashtoken ) => {
+export const sendResetPasswordEmail = async (email, name, hashtoken) => {
   const url = `${config.FRONTEND_URL}/reset-password?token=${hashtoken}`;
 
   try {

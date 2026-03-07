@@ -1,5 +1,5 @@
-import AppointmentModel from "../models/appointment.model";
-import Treatmentmodel from "../models/treatment.model";
+import AppointmentModel from "../models/appointment.model.js";
+import Treatmentmodel from "../models/treatment.model.js";
 
 export const createTreatment = async (req, res) => {
     try {

@@ -14,8 +14,8 @@ const Departmentrouter = express.Router();
 
 
 Departmentrouter.post("/", IdentifyUser, isAdmin, createDepartment);
-Departmentrouter.get("/", IdentifyUser, isAdmin, getAllDepartments);
-Departmentrouter.get("/:id", IdentifyUser, isAdmin, getDepartmentById);
+Departmentrouter.get("/", IdentifyUser, getAllDepartments);
+Departmentrouter.get("/:id", IdentifyUser, getDepartmentById);
 Departmentrouter.put("/:id", IdentifyUser, isAdmin, updateDepartment);
 Departmentrouter.delete("/:id", IdentifyUser, isAdmin, deleteDepartment);
 

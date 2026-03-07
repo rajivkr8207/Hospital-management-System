@@ -1,6 +1,6 @@
 import express from 'express'
 import IdentifyUser from '../middleware/auth.middleware.js'
-import { changeUserPassword, ForgetPassword, LoginUser, ProfileUser, RegisterUser, ReSendVerifyEmail, updateProfilePhoto, VerifyAccount } from "../controllers/auth.controller.js"
+import { changeUserPassword, ForgetPassword, get_me, LoginUser, LogoutUser, ProfileUser, RegisterUser, ReSendVerifyEmail, updateProfilePhoto, VerifyAccount } from "../controllers/auth.controller.js"
 import multer from 'multer'
 const AuthRouter = express.Router()
 const upload = multer({ storage: multer.memoryStorage() })
@@ -30,6 +30,9 @@ AuthRouter.patch(
     IdentifyUser,
     changeUserPassword
 );
+
+AuthRouter.get('/get-me', IdentifyUser, get_me)
+AuthRouter.get('/logout', IdentifyUser, LogoutUser)
 
 export default AuthRouter;
 
