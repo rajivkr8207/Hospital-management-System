@@ -7,6 +7,7 @@ import GenrateTokenByEmail from "../utils/GenrateTokenByEmail.js";
 import { mailQueue } from "../queues/mail.queue.js";
 import { imageQueue } from "../queues/image.queue.js";
 import DoctorService from "../service/doctor.service.js";
+import { sendResetPasswordEmail } from "../service/email.service.js";
 
 
 
@@ -123,6 +124,7 @@ export const ForgetPassword = async (req, res) => {
         })
     }
     const token = await GenrateTokenByEmail(email)
+    await sendResetPasswordEmail(user.email, user.fullname, token)
     await AuthService.ForgetPasswordTokenSave(user._id, token)
     return res.status(200).json({
         message: "Forgetpassword send on email",

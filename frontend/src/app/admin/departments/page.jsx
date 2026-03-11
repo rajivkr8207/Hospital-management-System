@@ -7,7 +7,6 @@ import CreateDepartment from "@/features/admin/departments/components/CreateDepa
 import ShowDepartmentCard from "@/features/admin/departments/components/ShowDepartmentCard";
 import { useAdmin } from "@/features/admin/context/AdminContext";
 import { CiSearch } from "react-icons/ci";
-import { FaRegEye, FaTrash } from "react-icons/fa";
 import DepartmentCard from "@/features/admin/departments/components/DepartmentCard";
 import UseDepartment from "@/features/admin/departments/hooks/UseDepartment";
 
@@ -78,15 +77,7 @@ const {sidebarCollapsed} = useAdmin()
             <p className="text-sm text-[#6B7280]">Total Departments</p>
           </div>
 
-          {/* <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-3xl">👨‍⚕️</span>
-            </div>
-            <h3 className="text-2xl font-bold text-[#2C3A4A]">
-              {departments.reduce((sum, dept) => sum + dept.doctorCount, 0)}
-            </h3>
-            <p className="text-sm text-[#6B7280]">Department Doctors</p>
-          </div> */}
+    
 
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6">
             <div className="flex items-center justify-between mb-2">

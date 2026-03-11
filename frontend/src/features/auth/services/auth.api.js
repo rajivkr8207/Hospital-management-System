@@ -28,3 +28,13 @@ export const LogOutUser = async () => {
     const res = await api.get('/auth/logout')
     return res.data
 }
+
+export const ForgotPasswordReq = async (data) => {
+    const res = await api.patch(`/auth/forget/password`,data)
+    return res
+}
+
+export const ForgotPasswordVerify = async (token, data) => {
+    const res = await api.patch(`/auth/forget/password/verify?token=${token}`,data)
+    return res
+}

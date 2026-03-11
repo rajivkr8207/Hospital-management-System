@@ -58,7 +58,7 @@ export const verifyEmailsendemail = async (email, name, hashtoken) => {
 
 
 export const sendResetPasswordEmail = async (email, name, hashtoken) => {
-  const url = `${config.FRONTEND_URL}/reset-password?token=${hashtoken}`;
+  const url = `${config.FRONTEND_URL}/forgot-password/verify?token=${hashtoken}`;
 
   try {
     const mailoptions = {

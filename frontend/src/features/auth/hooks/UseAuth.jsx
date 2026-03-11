@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/auth.context";
-import { LogOutUser, LoginUser, RegisterUser } from "../services/auth.api";
+import { ForgotPasswordReq, LogOutUser, LoginUser, RegisterUser } from "../services/auth.api";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
@@ -47,7 +47,20 @@ const UseAuth = () => {
       setLoading(false);
     }
   };
-  return { UserData, handleRegister, loading, handlelogin, handlelogout };
+
+  const handleForgotPasswordRequest = async (data)=>{
+     setLoading(true);
+    try {
+      const res = await ForgotPasswordReq(data);
+      toast.success(res.message);
+      router.push("/login");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  return { UserData, handleRegister, loading, handlelogin, handleForgotPasswordRequest,handlelogout };
 };
 
 export default UseAuth;

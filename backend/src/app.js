@@ -2,14 +2,12 @@ import express from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-// import swaggerUi from 'swagger-ui-express'
-// import swaggerSpec from './config/swagger.js'
 import AuthRouter from './routes/auth.routes.js'
 import Doctorrouter from './routes/doctor.route.js'
 import Departmentrouter from './routes/department.routes.js'
 import Adminrouter from './routes/admin.route.js'
-import { mailQueue } from './queues/mail.queue.js'
 import TreatmentRouter from './routes/treatment.route.js'
+import handleError from './middleware/error.middleware.js'
 
 const app = express()
 
@@ -19,7 +17,7 @@ app.use(cookieParser())
 
 app.use(cors({
   origin: ["http://localhost:3000"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true
   // allowedHeaders: ["Content-Type", "Authorization"]
 }));
@@ -27,19 +25,18 @@ app.use(cors({
 // app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/health", (req, res) => {
-  const jobid = mailQueue.add("welcomeMail", {});
+  // logger.info("health route accessed");
   res.status(200).json({
     success: true,
     status: "OK",
     timestamp: new Date(),
-    jobid
   });
 });
 
-app.get("/", (req, res) => {
+app.get("/", (req, res, next) => {
   res.json({
     success: true,
-    message: "TaskFlow API is running",
+    message: "Hospital Management API is running",
   });
 });
 
@@ -51,4 +48,5 @@ app.use('/api/admin', Adminrouter)
 app.use('/api/treatment', TreatmentRouter)
 
 
+// app.use(handleError)
 export default app
